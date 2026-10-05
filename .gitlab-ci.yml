@@ -1,0 +1,23 @@
+# Static-only fallback: GitLab Pages serves public/ with no /api routes, so every
+# vendor card shows a search link instead of live stock. The tests import only
+# Node builtins, so there is deliberately no install step.
+stages: [test, deploy]
+
+test:
+  stage: test
+  image: node:22-alpine
+  script:
+    - node --version
+    - node test/decode.test.mjs
+    - node test/adapters.test.mjs
+
+pages:
+  stage: deploy
+  image: alpine:3
+  script:
+    - echo "Publishing public/ as-is"
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
